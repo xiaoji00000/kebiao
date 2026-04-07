@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>曾文林 | 南理工课表</title>
+    <style>
+        :root { --bg: #f4f7f9; --grid-line: #e0e0e0; --text: #333; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: sans-serif; }
+        body { background: var(--bg); padding: 5px; color: var(--text); }
+        .header { text-align: center; padding: 15px 0; font-size: 18px; font-weight: bold; }
+        .timetable {
+            display: grid;
+            grid-template-columns: 40px repeat(5, 1fr);
+            grid-template-rows: 40px repeat(13, 55px);
+            gap: 1px;
+            background: var(--grid-line);
+            border: 1px solid var(--grid-line);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        .cell { background: #fff; display: flex; align-items: center; justify-content: center; font-size: 11px; text-align: center; padding: 2px; }
+        .head { background: #eee; font-weight: bold; }
+        .time-label { background: #f9f9f9; color: #888; font-size: 10px; }
+        .course {
+            border-radius: 4px;
+            padding: 4px;
+            font-size: 10px;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            line-height: 1.2;
+            z-index: 10;
+        }
+        .c-name { font-weight: bold; margin-bottom: 2px; }
+        /* 颜色方案 */
+        .color1 { background: #e8f0fe; color: #1967d2; } /* 蓝 */
+        .color2 { background: #fce8e6; color: #c5221f; } /* 红 */
+        .color3 { background: #e6f4ea; color: #137333; } /* 绿 */
+        .color4 { background: #fef7e0; color: #ea8600; } /* 黄 */
+        .color5 { background: #f3e8fd; color: #8430ce; } /* 紫 */
+        .color6 { background: #e4f7fb; color: #007b83; } /* 青 */
+    </style>
+</head>
+<body>
+    <div class="header">2025-2026-2 学期课表</div>
+    <div class="timetable" id="grid">
+        </div>
+
+<script>
+    const days = ['', '一', '二', '三', '四', '五'];
+    const container = document.getElementById('grid');
+    
+    // 渲染表头
+    days.forEach(d => container.innerHTML += `<div class="cell head">${d ? '周'+d : ''}</div>`);
+
+    // 渲染背景格子
+    for (let i = 1; i <= 13; i++) {
+        container.innerHTML += `<div class="cell time-label">${i}</div>`;
+        for (let j = 1; j <= 5; j++) {
+            container.innerHTML += `<div class="cell"></div>`;
+        }
+    }
+
+    // 录入抓取到的数据 [cite: 19-61]
+    const courses = [
+        { n: "图学基础", l: "致理A104", d: 1, s: 4, e: 5, c: "color1" },
+        { n: "程设基础(Ⅱ)", l: "致真A216", d: 1, s: 6, e: 7, c: "color2" },
+        { n: "高数(Ⅱ)", l: "格物C201", d: 1, s: 8, e: 10, c: "color3" },
+        { n: "心理健康", l: "工训阶3", d: 1, s: 11, e: 13, c: "color4" },
+        
+        { n: "军事理论", l: "工训阶2", d: 2, s: 1, e: 3, c: "color5" },
+        { n: "高数(Ⅱ)", l: "格物C201", d: 2, s: 4, e: 5, c: "color3" },
+        { n: "线性代数", l: "致理A108", d: 2, s: 6, e: 7, c: "color6" },
+        { n: "口译入门", l: "致理A122", d: 2, s: 8, e: 9, c: "color1" },
+        
+        { n: "大学物理(Ⅰ)", l: "格物C301", d: 3, s: 1, e: 3, c: "color2" },
+        { n: "图学基础", l: "致理A104", d: 3, s: 4, e: 5, c: "color1" },
+        { n: "物理辅导", l: "格物C301", d: 3, s: 6, e: 7, c: "color5" },
+        { n: "物理实验", l: "江阴", d: 3, s: 11, e: 13, c: "color6" },
+        
+        { n: "史纲", l: "致道A106", d: 4, s: 1, e: 3, c: "color4" },
+        { n: "高数(Ⅱ)", l: "格物C201", d: 4, s: 4, e: 5, c: "color3" },
+        { n: "学术英语", l: "致远A108", d: 4, s: 6, e: 7, c: "color1" },
+        { n: "线性代数", l: "致理A108", d: 4, s: 8, e: 9, c: "color6" },
+        
+        { n: "史纲", l: "致理A112", d: 5, s: 1, e: 3, c: "color4" },
+        { n: "大学物理(Ⅰ)", l: "格物C301", d: 5, s: 4, e: 5, c: "color2" },
+        { n: "形策(Ⅱ)", l: "格物C104", d: 5, s: 6, e: 7, c: "color5" },
+        { n: "体育(Ⅱ)", l: "跑道", d: 5, s: 8, e: 9, c: "color3" }
+    ];
+
+    courses.forEach(c => {
+        const div = document.createElement('div');
+        div.className = `course ${c.c}`;
+        div.style.gridColumn = c.d + 1;
+        div.style.gridRow = `${c.s + 1} / ${c.e + 2}`;
+        div.innerHTML = `<span class="c-name">${c.n}</span><span>@${c.l}</span>`;
+        container.appendChild(div);
+    });
+</script>
+</body>
+</html>
