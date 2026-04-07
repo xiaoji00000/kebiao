@@ -3,170 +3,88 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>曾文林的极客课表</title>
+    <title>曾文林的硬核课表</title>
     <style>
-        :root {
-            --primary: #4a90e2;
-            --bg: #f5f7fa;
-            --card-bg: #ffffff;
-            --text: #333;
-            --sec-text: #888;
-        }
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, sans-serif; }
-        body { background: var(--bg); color: var(--text); padding-bottom: 20px; }
-        
-        /* 顶部导航 */
-        .header {
-            background: var(--primary);
-            color: white;
-            padding: 20px 15px;
-            text-align: center;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
-        .week-info { font-size: 20px; font-weight: bold; margin-bottom: 5px; }
-        .date-info { font-size: 14px; opacity: 0.9; }
-
-        /* 星期横廊 */
-        .day-bar {
-            display: flex;
-            background: #fff;
-            padding: 10px 0;
-            border-bottom: 1px solid #eee;
-            position: sticky;
-            top: 85px;
-            z-index: 99;
-        }
-        .day-item {
-            flex: 1;
-            text-align: center;
-            font-size: 13px;
-            color: var(--sec-text);
-        }
-        .day-item.active { color: var(--primary); font-weight: bold; }
-
-        /* 课表主体 */
-        .schedule-container { padding: 10px; display: flex; flex-direction: row; overflow-x: auto; gap: 10px; }
-        .day-column { min-width: 100%; } /* 移动端一屏幕显示一天 */
-        
-        /* 卡片样式 */
-        .slot { margin-bottom: 15px; display: flex; position: relative; }
-        .time-axis {
-            width: 50px;
-            font-size: 12px;
-            color: var(--sec-text);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding-top: 5px;
-        }
-        .time-node { font-weight: bold; color: var(--text); }
-        
-        .course-card {
-            flex: 1;
-            background: var(--card-bg);
-            border-radius: 12px;
-            padding: 12px;
-            border-left: 5px solid var(--primary);
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-        }
-        .c-name { font-weight: bold; font-size: 15px; margin-bottom: 4px; display: block; }
-        .c-info { font-size: 12px; color: var(--sec-text); display: flex; gap: 8px; flex-wrap: wrap; }
-        .c-loc { color: #e67e22; font-weight: 500; }
-
-        /* 颜色区分 */
-        .color-blue { border-left-color: #4a90e2; background: #f0f7ff; }
-        .color-red { border-left-color: #e74c3c; background: #fff5f5; }
-        .color-green { border-left-color: #2ecc71; background: #f2fff7; }
-        .color-orange { border-left-color: #f39c12; background: #fffaf0; }
-        .color-purple { border-left-color: #9b59b6; background: #faf5ff; }
+        :root { --primary: #4a90e2; --bg: #f5f7fa; --card: #fff; --text: #333; --sec: #888; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: sans-serif; }
+        body { background: var(--bg); color: var(--text); padding_bottom: 20px; }
+        .header { background: var(--primary); color: #fff; padding: 15px; text-align: center; position: sticky; top: 0; z_index: 100; }
+        .week_info { font_size: 18px; font_weight: bold; margin_bottom: 4px; }
+        .date_info { font_size: 12px; opacity: 0.8; }
+        .day_bar { display: flex; background: #fff; padding: 10px 0; border_bottom: 1px solid #eee; position: sticky; top: 72px; z_index: 99; }
+        .day_item { flex: 1; text_align: center; font_size: 13px; color: var(--sec); cursor: pointer; transition: 0.2s; }
+        .day_item.active { color: var(--primary); font_weight: bold; transform: scale(1.1); }
+        .schedule_body { padding: 12px; }
+        .slot { margin_bottom: 12px; display: flex; animation: fadeIn 0.3s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .time_axis { width: 65px; font_size: 11px; color: var(--sec); display: flex; flex_direction: column; align_items: center; padding_top: 4px; }
+        .time_start { font_weight: bold; color: var(--text); font_size: 13px; }
+        .course_card { flex: 1; background: var(--card); border_radius: 10px; padding: 12px; border_left: 4px solid var(--primary); box_shadow: 0 2px 6px rgba(0,0,0,0.05); }
+        .c_name { font_weight: bold; font_size: 15px; margin_bottom: 4px; display: block; }
+        .c_info { font_size: 11px; color: var(--sec); display: flex; flex_direction: column; gap: 2px; }
+        .c_loc { color: #e67e22; font_weight: bold; }
+        .color1 { border_left_color: #4a90e2; background: #f0f7ff; }
+        .color2 { border_left_color: #e74c3c; background: #fff5f5; }
+        .color3 { border_left_color: #2ecc71; background: #f2fff7; }
+        .color4 { border_left_color: #f39c12; background: #fffaf0; }
+        .color5 { border_left_color: #9b59b6; background: #faf5ff; }
     </style>
 </head>
 <body>
-
 <div class="header">
-    <div class="week-info" id="current-week-display">第 1 周</div>
-    <div class="date-info" id="today-date">2026年4月7日</div>
+    <div class="week_info" id="week_display">第 7 周</div>
+    <div class="date_info" id="date_display">2026年4月7日</div>
 </div>
-
-<div class="day-bar" id="day-bar">
-    <div class="day-item">周一</div>
-    <div class="day-item">周二</div>
-    <div class="day-item">周三</div>
-    <div class="day-item">周四</div>
-    <div class="day-item">周五</div>
+<div class="day_bar" id="day_bar">
+    <div class="day_item" onclick="switchDay(1)">周一</div>
+    <div class="day_item" onclick="switchDay(2)">周二</div>
+    <div class="day_item" onclick="switchDay(3)">周三</div>
+    <div class="day_item" onclick="switchDay(4)">周四</div>
+    <div class="day_item" onclick="switchDay(5)">周五</div>
 </div>
-
-<div id="schedule-body" style="padding: 15px;">
-    </div>
-
+<div id="schedule_body" class="schedule_body"></div>
 <script>
-    // 1. 核心时间逻辑
-    const START_DATE = new Date('2026-02-23'); // 2026春季开学周一
+    const START = new Date('2026/02/23'); 
     const now = new Date();
-    const diffTime = now - START_DATE;
-    const currentWeek = Math.max(1, Math.ceil(diffTime / (7 * 24 * 60 * 60 * 1000)));
-    const currentDay = now.getDay() === 0 ? 7 : now.getDay(); // 1至7
-
-    document.getElementById('current-week-display').innerText = `第 ${currentWeek} 周`;
-    document.getElementById('today-date').innerText = now.toLocaleDateString('zh-CN', {year:'numeric', month:'long', day:'numeric'});
-
-    // 2. 原始数据 (基于你的源码 kb.txt)
-    const rawData = [
-        { name: "军事理论", loc: "工训阶2", day: 2, start: 1, end: 3, weeks: [1,11], time: "08:00", cls: "color-blue" },
-        { name: "图学基础", loc: "致理A104", day: 1, start: 4, end: 5, weeks: [1,6], time: "10:40", cls: "color-orange" },
-        { name: "图学基础", loc: "致理A104", day: 3, start: 4, end: 5, weeks: [1,6], time: "10:40", cls: "color-orange" },
-        { name: "高数(Ⅱ)", loc: "格物C201", day: 1, start: 8, end: 10, weeks: [1,16], time: "15:50", cls: "color-green" },
-        { name: "高数(Ⅱ)", loc: "格物C201", day: 2, start: 4, end: 5, weeks: [1,16], time: "10:40", cls: "color-green" },
-        { name: "线性代数", loc: "致理A108", day: 2, start: 6, end: 7, weeks: [1,10], time: "14:00", cls: "color-purple" },
-        { name: "大学物理(Ⅰ)", loc: "格物C301", day: 3, start: 1, end: 3, weeks: [1,12], time: "08:00", cls: "color-red" },
-        { name: "程序设计(Ⅱ)", loc: "致真A216", day: 1, start: 6, end: 7, weeks: [1,12], time: "14:00", cls: "color-blue" },
-        { name: "近现代史纲要", loc: "致道A106", day: 4, start: 1, end: 3, weeks: [1,14], time: "08:00", cls: "color-orange" },
-        { name: "体育(Ⅱ)", loc: "跑道", day: 5, start: 8, end: 9, weeks: [1,16], time: "15:50", cls: "color-green" }
+    const curWeek = Math.max(1, Math.ceil((now - START) / (7 * 24 * 60 * 60 * 1000)));
+    let selectedDay = now.getDay() === 0 || now.getDay() > 5 ? 1 : now.getDay();
+    const raw = [
+        { n: "图学基础", l: "致理A104", d: 1, s: 4, e: 5, w: [1,6], t: "10:40~12:15", c: "color4" },
+        { n: "程设基础(Ⅱ)", l: "致真A216", d: 1, s: 6, e: 7, w: [1,12], t: "14:00~15:35", c: "color1" },
+        { n: "高数(Ⅱ)", l: "格物C201", d: 1, s: 8, e: 10, w: [1,16], t: "15:50~18:15", c: "color3" },
+        { n: "心理健康", l: "工训阶3", d: 1, s: 11, e: 13, w: [1,6], t: "19:00~21:15", c: "color5" },
+        { n: "军事理论", l: "工训阶2", d: 2, s: 1, e: 3, w: [1,11], t: "08:00~10:15", c: "color1" },
+        { n: "高数(Ⅱ)", l: "格物C201", d: 2, s: 4, e: 5, w: [1,16], t: "10:40~12:15", c: "color3" },
+        { n: "线性代数", l: "致理A108", d: 2, s: 6, e: 7, w: [1,10], t: "14:00~15:35", c: "color2" },
+        { n: "口译入门", l: "致理A122", d: 2, s: 8, e: 9, w: [1,16], t: "15:50~17:25", c: "color4" },
+        { n: "大学物理(Ⅰ)", l: "格物C301", d: 3, s: 1, e: 3, w: [1,12], t: "08:00~10:15", c: "color2" },
+        { n: "图学基础", l: "致理A104", d: 3, s: 4, e: 5, w: [1,6], t: "10:40~12:15", c: "color4" },
+        { n: "物理辅导", l: "格物C301", d: 3, s: 6, e: 7, w: [2,10], t: "14:00~15:35", c: "color5" },
+        { n: "物理实验", l: "江阴校区", d: 3, s: 11, e: 13, w: [1,15], t: "19:00~21:15", c: "color1" },
+        { n: "史纲", l: "致道A106", d: 4, s: 1, e: 3, w: [4,4], t: "08:00~10:15", c: "color4" },
+        { n: "高数(Ⅱ)", l: "格物C201", d: 4, s: 4, e: 5, w: [1,16], t: "10:40~12:15", c: "color3" },
+        { n: "学术英语", l: "致远A108", d: 4, s: 6, e: 7, w: [1,16], t: "14:00~15:35", c: "color1" },
+        { n: "线性代数", l: "致理A108", d: 4, s: 8, e: 9, w: [1,10], t: "15:50~17:25", c: "color2" },
+        { n: "史纲", l: "致理A112", d: 5, s: 1, e: 3, w: [1,14], t: "08:00~10:15", c: "color4" },
+        { n: "大学物理(Ⅰ)", l: "格物C301", d: 5, s: 4, e: 5, w: [1,12], t: "10:40~12:15", c: "color2" },
+        { n: "形策(Ⅱ)", l: "格物C104", d: 5, s: 6, e: 7, w: [5,8], t: "14:00~15:35", c: "color5" },
+        { n: "体育(Ⅱ)", l: "运动场", d: 5, s: 8, e: 9, w: [1,16], t: "15:50~17:25", c: "color3" }
     ];
-
-    // 3. 渲染逻辑
+    function switchDay(d) { selectedDay = d; render(); }
     function render() {
-        const container = document.getElementById('schedule-body');
+        document.getElementById('week_display').innerText = `第 ${curWeek} 周`;
+        document.getElementById('date_display').innerText = now.toLocaleDateString();
+        const items = document.querySelectorAll('.day_item');
+        items.forEach((item, idx) => { item.classList.toggle('active', idx + 1 === selectedDay); });
+        const container = document.getElementById('schedule_body');
         container.innerHTML = '';
-        
-        // 过滤出今天的课，且在当前周内的
-        const todayCourses = rawData.filter(c => c.day === currentDay && currentWeek >= c.weeks[0] && currentWeek <= c.weeks[1]);
-        
-        if (todayCourses.length === 0) {
-            container.innerHTML = '<div style="text-align:center; padding:50px; color:#999;">今天没课，去图书馆卷代码吧</div>';
-            return;
-        }
-
-        // 按开始节次排序
-        todayCourses.sort((a, b) => a.start - b.start);
-
-        todayCourses.forEach(c => {
-            container.innerHTML += `
-                <div class="slot">
-                    <div class="time-axis">
-                        <span class="time-node">${c.time}</span>
-                        <span style="font-size:10px">第${c.start}节</span>
-                    </div>
-                    <div class="course-card ${c.cls}">
-                        <span class="c-name">${c.name}</span>
-                        <div class="c-info">
-                            <span class="c-loc">📍 ${c.loc}</span>
-                            <span>👤 教师见源码</span>
-                            <span>📅 ${c.weeks[0]}-${c.weeks[1]}周</span>
-                        </div>
-                    </div>
-                </div>
-            `;
+        const daily = raw.filter(c => c.d === selectedDay && curWeek >= c.w[0] && curWeek <= c.w[1]).sort((a,b)=>a.s - b.s);
+        if(daily.length === 0) { container.innerHTML = '<p style="text_align:center;color:#999;padding_top:40px;">今天没课，去写 LeetCode 吧</p>'; return; }
+        daily.forEach(c => {
+            const [startT, endT] = c.t.split('~');
+            container.innerHTML += `<div class="slot"><div class="time_axis"><span class="time_start">${startT}</span><span style="font_size:9px;">${endT}</span></div><div class="course_card ${c.c}"><span class="c_name">${c.n}</span><div class="c_info"><span class="c_loc">📍 ${c.l}</span><span>📅 第${c.s}-${c.e}节 | ${c.w[0]}-${c.w[1]}周</span></div></div></div>`;
         });
-
-        // 高亮周几
-        const barItems = document.querySelectorAll('.day-item');
-        if (currentDay <= 5) barItems[currentDay - 1].classList.add('active');
     }
-
     render();
 </script>
 </body>
