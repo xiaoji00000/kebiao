@@ -3,102 +3,171 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>曾文林 | 南理工课表</title>
+    <title>曾文林的极客课表</title>
     <style>
-        :root { --bg: #f4f7f9; --grid-line: #e0e0e0; --text: #333; }
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: sans-serif; }
-        body { background: var(--bg); padding: 5px; color: var(--text); }
-        .header { text-align: center; padding: 15px 0; font-size: 18px; font-weight: bold; }
-        .timetable {
-            display: grid;
-            grid-template-columns: 40px repeat(5, 1fr);
-            grid-template-rows: 40px repeat(13, 55px);
-            gap: 1px;
-            background: var(--grid-line);
-            border: 1px solid var(--grid-line);
-            border-radius: 8px;
-            overflow: hidden;
+        :root {
+            --primary: #4a90e2;
+            --bg: #f5f7fa;
+            --card-bg: #ffffff;
+            --text: #333;
+            --sec-text: #888;
         }
-        .cell { background: #fff; display: flex; align-items: center; justify-content: center; font-size: 11px; text-align: center; padding: 2px; }
-        .head { background: #eee; font-weight: bold; }
-        .time-label { background: #f9f9f9; color: #888; font-size: 10px; }
-        .course {
-            border-radius: 4px;
-            padding: 4px;
-            font-size: 10px;
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, sans-serif; }
+        body { background: var(--bg); color: var(--text); padding-bottom: 20px; }
+        
+        /* 顶部导航 */
+        .header {
+            background: var(--primary);
+            color: white;
+            padding: 20px 15px;
+            text-align: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .week-info { font-size: 20px; font-weight: bold; margin-bottom: 5px; }
+        .date-info { font-size: 14px; opacity: 0.9; }
+
+        /* 星期横廊 */
+        .day-bar {
+            display: flex;
+            background: #fff;
+            padding: 10px 0;
+            border-bottom: 1px solid #eee;
+            position: sticky;
+            top: 85px;
+            z-index: 99;
+        }
+        .day-item {
+            flex: 1;
+            text-align: center;
+            font-size: 13px;
+            color: var(--sec-text);
+        }
+        .day-item.active { color: var(--primary); font-weight: bold; }
+
+        /* 课表主体 */
+        .schedule-container { padding: 10px; display: flex; flex-direction: row; overflow-x: auto; gap: 10px; }
+        .day-column { min-width: 100%; } /* 移动端一屏幕显示一天 */
+        
+        /* 卡片样式 */
+        .slot { margin-bottom: 15px; display: flex; position: relative; }
+        .time-axis {
+            width: 50px;
+            font-size: 12px;
+            color: var(--sec-text);
             display: flex;
             flex-direction: column;
-            justify-content: flex-start;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-            line-height: 1.2;
-            z-index: 10;
+            align-items: center;
+            padding-top: 5px;
         }
-        .c-name { font-weight: bold; margin-bottom: 2px; }
-        /* 颜色方案 */
-        .color1 { background: #e8f0fe; color: #1967d2; } /* 蓝 */
-        .color2 { background: #fce8e6; color: #c5221f; } /* 红 */
-        .color3 { background: #e6f4ea; color: #137333; } /* 绿 */
-        .color4 { background: #fef7e0; color: #ea8600; } /* 黄 */
-        .color5 { background: #f3e8fd; color: #8430ce; } /* 紫 */
-        .color6 { background: #e4f7fb; color: #007b83; } /* 青 */
+        .time-node { font-weight: bold; color: var(--text); }
+        
+        .course-card {
+            flex: 1;
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 12px;
+            border-left: 5px solid var(--primary);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        .c-name { font-weight: bold; font-size: 15px; margin-bottom: 4px; display: block; }
+        .c-info { font-size: 12px; color: var(--sec-text); display: flex; gap: 8px; flex-wrap: wrap; }
+        .c-loc { color: #e67e22; font-weight: 500; }
+
+        /* 颜色区分 */
+        .color-blue { border-left-color: #4a90e2; background: #f0f7ff; }
+        .color-red { border-left-color: #e74c3c; background: #fff5f5; }
+        .color-green { border-left-color: #2ecc71; background: #f2fff7; }
+        .color-orange { border-left-color: #f39c12; background: #fffaf0; }
+        .color-purple { border-left-color: #9b59b6; background: #faf5ff; }
     </style>
 </head>
 <body>
-    <div class="header">2025-2026-2 学期课表</div>
-    <div class="timetable" id="grid">
-        </div>
+
+<div class="header">
+    <div class="week-info" id="current-week-display">第 1 周</div>
+    <div class="date-info" id="today-date">2026年4月7日</div>
+</div>
+
+<div class="day-bar" id="day-bar">
+    <div class="day-item">周一</div>
+    <div class="day-item">周二</div>
+    <div class="day-item">周三</div>
+    <div class="day-item">周四</div>
+    <div class="day-item">周五</div>
+</div>
+
+<div id="schedule-body" style="padding: 15px;">
+    </div>
 
 <script>
-    const days = ['', '一', '二', '三', '四', '五'];
-    const container = document.getElementById('grid');
-    
-    // 渲染表头
-    days.forEach(d => container.innerHTML += `<div class="cell head">${d ? '周'+d : ''}</div>`);
+    // 1. 核心时间逻辑
+    const START_DATE = new Date('2026-02-23'); // 2026春季开学周一
+    const now = new Date();
+    const diffTime = now - START_DATE;
+    const currentWeek = Math.max(1, Math.ceil(diffTime / (7 * 24 * 60 * 60 * 1000)));
+    const currentDay = now.getDay() === 0 ? 7 : now.getDay(); // 1至7
 
-    // 渲染背景格子
-    for (let i = 1; i <= 13; i++) {
-        container.innerHTML += `<div class="cell time-label">${i}</div>`;
-        for (let j = 1; j <= 5; j++) {
-            container.innerHTML += `<div class="cell"></div>`;
-        }
-    }
+    document.getElementById('current-week-display').innerText = `第 ${currentWeek} 周`;
+    document.getElementById('today-date').innerText = now.toLocaleDateString('zh-CN', {year:'numeric', month:'long', day:'numeric'});
 
-    // 录入抓取到的数据 [cite: 19-61]
-    const courses = [
-        { n: "图学基础", l: "致理A104", d: 1, s: 4, e: 5, c: "color1" },
-        { n: "程设基础(Ⅱ)", l: "致真A216", d: 1, s: 6, e: 7, c: "color2" },
-        { n: "高数(Ⅱ)", l: "格物C201", d: 1, s: 8, e: 10, c: "color3" },
-        { n: "心理健康", l: "工训阶3", d: 1, s: 11, e: 13, c: "color4" },
-        
-        { n: "军事理论", l: "工训阶2", d: 2, s: 1, e: 3, c: "color5" },
-        { n: "高数(Ⅱ)", l: "格物C201", d: 2, s: 4, e: 5, c: "color3" },
-        { n: "线性代数", l: "致理A108", d: 2, s: 6, e: 7, c: "color6" },
-        { n: "口译入门", l: "致理A122", d: 2, s: 8, e: 9, c: "color1" },
-        
-        { n: "大学物理(Ⅰ)", l: "格物C301", d: 3, s: 1, e: 3, c: "color2" },
-        { n: "图学基础", l: "致理A104", d: 3, s: 4, e: 5, c: "color1" },
-        { n: "物理辅导", l: "格物C301", d: 3, s: 6, e: 7, c: "color5" },
-        { n: "物理实验", l: "江阴", d: 3, s: 11, e: 13, c: "color6" },
-        
-        { n: "史纲", l: "致道A106", d: 4, s: 1, e: 3, c: "color4" },
-        { n: "高数(Ⅱ)", l: "格物C201", d: 4, s: 4, e: 5, c: "color3" },
-        { n: "学术英语", l: "致远A108", d: 4, s: 6, e: 7, c: "color1" },
-        { n: "线性代数", l: "致理A108", d: 4, s: 8, e: 9, c: "color6" },
-        
-        { n: "史纲", l: "致理A112", d: 5, s: 1, e: 3, c: "color4" },
-        { n: "大学物理(Ⅰ)", l: "格物C301", d: 5, s: 4, e: 5, c: "color2" },
-        { n: "形策(Ⅱ)", l: "格物C104", d: 5, s: 6, e: 7, c: "color5" },
-        { n: "体育(Ⅱ)", l: "跑道", d: 5, s: 8, e: 9, c: "color3" }
+    // 2. 原始数据 (基于你的源码 kb.txt)
+    const rawData = [
+        { name: "军事理论", loc: "工训阶2", day: 2, start: 1, end: 3, weeks: [1,11], time: "08:00", cls: "color-blue" },
+        { name: "图学基础", loc: "致理A104", day: 1, start: 4, end: 5, weeks: [1,6], time: "10:40", cls: "color-orange" },
+        { name: "图学基础", loc: "致理A104", day: 3, start: 4, end: 5, weeks: [1,6], time: "10:40", cls: "color-orange" },
+        { name: "高数(Ⅱ)", loc: "格物C201", day: 1, start: 8, end: 10, weeks: [1,16], time: "15:50", cls: "color-green" },
+        { name: "高数(Ⅱ)", loc: "格物C201", day: 2, start: 4, end: 5, weeks: [1,16], time: "10:40", cls: "color-green" },
+        { name: "线性代数", loc: "致理A108", day: 2, start: 6, end: 7, weeks: [1,10], time: "14:00", cls: "color-purple" },
+        { name: "大学物理(Ⅰ)", loc: "格物C301", day: 3, start: 1, end: 3, weeks: [1,12], time: "08:00", cls: "color-red" },
+        { name: "程序设计(Ⅱ)", loc: "致真A216", day: 1, start: 6, end: 7, weeks: [1,12], time: "14:00", cls: "color-blue" },
+        { name: "近现代史纲要", loc: "致道A106", day: 4, start: 1, end: 3, weeks: [1,14], time: "08:00", cls: "color-orange" },
+        { name: "体育(Ⅱ)", loc: "跑道", day: 5, start: 8, end: 9, weeks: [1,16], time: "15:50", cls: "color-green" }
     ];
 
-    courses.forEach(c => {
-        const div = document.createElement('div');
-        div.className = `course ${c.c}`;
-        div.style.gridColumn = c.d + 1;
-        div.style.gridRow = `${c.s + 1} / ${c.e + 2}`;
-        div.innerHTML = `<span class="c-name">${c.n}</span><span>@${c.l}</span>`;
-        container.appendChild(div);
-    });
+    // 3. 渲染逻辑
+    function render() {
+        const container = document.getElementById('schedule-body');
+        container.innerHTML = '';
+        
+        // 过滤出今天的课，且在当前周内的
+        const todayCourses = rawData.filter(c => c.day === currentDay && currentWeek >= c.weeks[0] && currentWeek <= c.weeks[1]);
+        
+        if (todayCourses.length === 0) {
+            container.innerHTML = '<div style="text-align:center; padding:50px; color:#999;">今天没课，去图书馆卷代码吧</div>';
+            return;
+        }
+
+        // 按开始节次排序
+        todayCourses.sort((a, b) => a.start - b.start);
+
+        todayCourses.forEach(c => {
+            container.innerHTML += `
+                <div class="slot">
+                    <div class="time-axis">
+                        <span class="time-node">${c.time}</span>
+                        <span style="font-size:10px">第${c.start}节</span>
+                    </div>
+                    <div class="course-card ${c.cls}">
+                        <span class="c-name">${c.name}</span>
+                        <div class="c-info">
+                            <span class="c-loc">📍 ${c.loc}</span>
+                            <span>👤 教师见源码</span>
+                            <span>📅 ${c.weeks[0]}-${c.weeks[1]}周</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+        });
+
+        // 高亮周几
+        const barItems = document.querySelectorAll('.day-item');
+        if (currentDay <= 5) barItems[currentDay - 1].classList.add('active');
+    }
+
+    render();
 </script>
 </body>
 </html>
